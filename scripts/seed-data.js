@@ -49,7 +49,143 @@ const HomeSlideSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
-// Sample data
+// PageAsset Schema
+const PageAssetSchema = new mongoose.Schema({
+    page: { type: String, required: true },
+    section: { type: String, required: true },
+    key: { type: String, required: true },
+    imageUrl: { type: String, required: true },
+    alt: String,
+    altAr: String,
+    text: String,
+    textAr: String,
+    order: { type: Number, default: 0 }
+}, { timestamps: true });
+
+PageAssetSchema.index({ page: 1, section: 1, key: 1 }, { unique: true });
+
+const samplePageAssets = [
+    // About Page - Intro
+    {
+        page: 'about',
+        section: 'intro',
+        key: 'main-image',
+        imageUrl: 'https://www.landscapingkw.com/wp-content/uploads/2022/03/%D8%AA%D8%B5%D9%85%D9%8A%D9%85-%D8%AD%D8%AF%D8%A7%D8%A6%D9%82-%D9%81%D9%84%D9%84-%D8%A8%D8%A7%D9%84%D9%83%D9%88%D9%8A%D8%AA-%D8%AA%D9%86%D8%B3%D9%8A%D9%82-%D8%AD%D8%AF%D8%A7%D8%A6%D9%82-%D9%81%D9%84%D9%84-%D8%A8%D8%A7%D9%84%D9%83%D9%88%D9%8A%D8%AA.jpg',
+        alt: 'Landscaping Professional Team',
+        altAr: 'فريق عمل محترف لتنسيق الحدائق'
+    },
+    // About Page - Team
+    {
+        page: 'about',
+        section: 'team',
+        key: 'member-1',
+        imageUrl: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+        alt: 'Design Manager',
+        altAr: 'مدير التصميم',
+        text: 'Ahmed Mohamed',
+        textAr: 'أحمد محمد'
+    },
+    {
+        page: 'about',
+        section: 'team',
+        key: 'member-2',
+        imageUrl: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+        alt: 'Agricultural Engineer',
+        altAr: 'مهندسة زراعية',
+        text: 'Sara Ahmed',
+        textAr: 'سارة أحمد'
+    },
+    {
+        page: 'about',
+        section: 'team',
+        key: 'member-3',
+        imageUrl: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+        alt: 'Execution Supervisor',
+        altAr: 'مشرف التنفيذ',
+        text: 'Mohamed Ali',
+        textAr: 'محمد علي'
+    }
+];
+
+async function seedData() {
+    try {
+        await mongoose.connect(MONGODB_URI);
+        console.log('Connected to MongoDB');
+
+        const Project = mongoose.models.Project || mongoose.model('Project', ProjectSchema);
+        const Service = mongoose.models.Service || mongoose.model('Service', ServiceSchema);
+        const Banner = mongoose.models.Banner || mongoose.model('Banner', BannerSchema);
+        const HomeSlide = mongoose.models.HomeSlide || mongoose.model('HomeSlide', HomeSlideSchema);
+        const PageAsset = mongoose.models.PageAsset || mongoose.model('PageAsset', PageAssetSchema);
+
+        // Check if data already exists
+        const projectCount = await Project.countDocuments();
+        const serviceCount = await Service.countDocuments();
+        const bannerCount = await Banner.countDocuments();
+        const homeSlideCount = await HomeSlide.countDocuments();
+        const pageAssetCount = await PageAsset.countDocuments();
+
+        console.log(`Current counts - Projects: ${projectCount}, Services: ${serviceCount}, Banners: ${bannerCount}, Home Slides: ${homeSlideCount}, Page Assets: ${pageAssetCount}`);
+
+        // Seed Projects
+        if (projectCount === 0) {
+            await Project.insertMany(sampleProjects);
+            console.log(`✓ Seeded ${sampleProjects.length} projects`);
+        } else {
+            console.log('→ Projects already exist, skipping...');
+        }
+
+        // Seed Services
+        if (serviceCount === 0) {
+            await Service.insertMany(sampleServices);
+            console.log(`✓ Seeded ${sampleServices.length} services`);
+        } else {
+            console.log('→ Services already exist, skipping...');
+        }
+
+        // Seed Banners (upsert to avoid duplicates)
+        for (const banner of sampleBanners) {
+            await Banner.findOneAndUpdate(
+                { page: banner.page },
+                banner,
+                { upsert: true, new: true }
+            );
+        }
+        console.log(`✓ Seeded/Updated ${sampleBanners.length} banners`);
+
+        // Seed Home Slides
+        if (homeSlideCount === 0) {
+            await HomeSlide.insertMany(sampleHomeSlides);
+            console.log(`✓ Seeded ${sampleHomeSlides.length} home slides`);
+        } else {
+            console.log('→ Home slides already exist, skipping...');
+        }
+
+        // Seed Page Assets
+        for (const asset of samplePageAssets) {
+            await PageAsset.findOneAndUpdate(
+                { page: asset.page, section: asset.section, key: asset.key },
+                asset,
+                { upsert: true, new: true }
+            );
+        }
+        console.log(`✓ Seeded/Updated ${samplePageAssets.length} page assets`);
+
+        console.log('\n✅ Data seeding completed successfully!');
+        console.log('\nYou can now view:');
+        console.log('- Projects in the Portfolio section');
+        console.log('- Services in the Services section');
+        console.log('- Banners as background images');
+        console.log('- Home Slides in the homepage slider');
+        console.log('- Dynamic Page Assets in About Us section');
+
+    } catch (error) {
+        console.error('Error seeding data:', error);
+    } finally {
+        await mongoose.disconnect();
+        process.exit(0);
+    }
+}
 const sampleProjects = [
     {
         title: 'Luxury Villa Garden',
@@ -274,71 +410,5 @@ const sampleHomeSlides = [
     },
 ];
 
-async function seedData() {
-    try {
-        await mongoose.connect(MONGODB_URI);
-        console.log('Connected to MongoDB');
-
-        const Project = mongoose.models.Project || mongoose.model('Project', ProjectSchema);
-        const Service = mongoose.models.Service || mongoose.model('Service', ServiceSchema);
-        const Banner = mongoose.models.Banner || mongoose.model('Banner', BannerSchema);
-        const HomeSlide = mongoose.models.HomeSlide || mongoose.model('HomeSlide', HomeSlideSchema);
-
-        // Check if data already exists
-        const projectCount = await Project.countDocuments();
-        const serviceCount = await Service.countDocuments();
-        const bannerCount = await Banner.countDocuments();
-        const homeSlideCount = await HomeSlide.countDocuments();
-
-        console.log(`Current counts - Projects: ${projectCount}, Services: ${serviceCount}, Banners: ${bannerCount}, Home Slides: ${homeSlideCount}`);
-
-        // Seed Projects
-        if (projectCount === 0) {
-            await Project.insertMany(sampleProjects);
-            console.log(`✓ Seeded ${sampleProjects.length} projects`);
-        } else {
-            console.log('→ Projects already exist, skipping...');
-        }
-
-        // Seed Services
-        if (serviceCount === 0) {
-            await Service.insertMany(sampleServices);
-            console.log(`✓ Seeded ${sampleServices.length} services`);
-        } else {
-            console.log('→ Services already exist, skipping...');
-        }
-
-        // Seed Banners (upsert to avoid duplicates)
-        for (const banner of sampleBanners) {
-            await Banner.findOneAndUpdate(
-                { page: banner.page },
-                banner,
-                { upsert: true, new: true }
-            );
-        }
-        console.log(`✓ Seeded/Updated ${sampleBanners.length} banners`);
-
-        // Seed Home Slides
-        if (homeSlideCount === 0) {
-            await HomeSlide.insertMany(sampleHomeSlides);
-            console.log(`✓ Seeded ${sampleHomeSlides.length} home slides`);
-        } else {
-            console.log('→ Home slides already exist, skipping...');
-        }
-
-        console.log('\n✅ Data seeding completed successfully!');
-        console.log('\nYou can now view:');
-        console.log('- Projects in the Portfolio section');
-        console.log('- Services in the Services section');
-        console.log('- Banners as background images');
-        console.log('- Home Slides in the homepage slider');
-
-    } catch (error) {
-        console.error('Error seeding data:', error);
-    } finally {
-        await mongoose.disconnect();
-        process.exit(0);
-    }
-}
 
 seedData();

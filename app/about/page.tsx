@@ -56,6 +56,40 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = '' }: { end: string; d
 };
 
 const About = () => {
+    const [banner, setBanner] = useState<string>('');
+    const [introImage, setIntroImage] = useState<any>(null);
+    const [teamMembers, setTeamMembers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch Banner
+                const bannerRes = await fetch('/api/banners');
+                const banners = await bannerRes.json();
+                const aboutBanner = banners.find((b: any) => b.page === 'about');
+                if (aboutBanner) setBanner(aboutBanner.image);
+
+                // Fetch Page Assets
+                const assetsRes = await fetch('/api/page-assets?page=about');
+                const assets = await assetsRes.json();
+
+                const mainImage = assets.find((a: any) => a.key === 'main-image');
+                if (mainImage) setIntroImage(mainImage);
+
+                const team = assets.filter((a: any) => a.section === 'team').sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+                if (team.length > 0) setTeamMembers(team);
+
+            } catch (error) {
+                console.error('Failed to fetch data', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     const values = [
         {
             icon: <Award className="w-8 h-8" />,
@@ -86,32 +120,26 @@ const About = () => {
         { number: '50', label: 'متخصص', suffix: '+' }
     ];
 
-    const teamMembers = [
-        {
-            name: 'أحمد محمد',
-            position: 'مدير التصميم',
-            experience: '10 سنوات خبرة',
-            image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-        },
-        {
-            name: 'سارة أحمد',
-            position: 'مهندسة زراعية',
-            experience: '8 سنوات خبرة',
-            image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-        },
-        {
-            name: 'محمد علي',
-            position: 'مشرف التنفيذ',
-            experience: '12 سنة خبرة',
-            image: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-        }
-    ];
+    // Helper to determine image source
+    const getImageSrc = (url: string) => {
+        if (!url) return '';
+        if (url.startsWith('http') || url.startsWith('/')) return url;
+        return `/api/images/${url}`;
+    };
 
     return (
         <div className="min-h-screen pt-20">
             {/* Header */}
-            <section className="py-20 bg-gradient-to-r from-green-600 to-green-700 text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <section
+                className="py-20 relative bg-gray-900 text-white overflow-hidden"
+                style={{
+                    backgroundImage: banner ? `url(${getImageSrc(banner)})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                }}
+            >
+                <div className="absolute inset-0 bg-black/60"></div>
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
                     <h1 className="text-4xl md:text-5xl font-bold mb-6">من نحن</h1>
                     <p className="text-xl text-green-100 max-w-3xl mx-auto">
                         لاندسكيب ماسترز بالرياض - شركة رائدة في تصميم وتنسيق الحدائق في المملكة العربية السعودية
@@ -141,9 +169,9 @@ const About = () => {
 
                         <div className="relative">
                             <img
-                                src="https://www.landscapingkw.com/wp-content/uploads/2022/03/%D8%AA%D8%B5%D9%85%D9%8A%D9%85-%D8%AD%D8%AF%D8%A7%D8%A6%D9%82-%D9%81%D9%84%D9%84-%D8%A8%D8%A7%D9%84%D9%83%D9%88%D9%8A%D8%AA-%D8%AA%D9%86%D8%B3%D9%8A%D9%82-%D8%AD%D8%AF%D8%A7%D8%A6%D9%82-%D9%81%D9%84%D9%84-%D8%A8%D8%A7%D9%84%D9%83%D9%88%D9%8A%D8%AA.jpg"
-                                alt="تنسيق حدائق فلل"
-                                className="rounded-lg shadow-xl"
+                                src={introImage ? getImageSrc(introImage.imageUrl) : "https://www.landscapingkw.com/wp-content/uploads/2022/03/%D8%AA%D8%B5%D9%85%D9%8A%D9%85-%D8%AD%D8%AF%D8%A7%D8%A6%D9%82-%D9%81%D9%84%D9%84-%D8%A8%D8%A7%D9%84%D9%83%D9%88%D9%8A%D8%AA-%D8%AA%D9%86%D8%B3%D9%8A%D9%82-%D8%AD%D8%AF%D8%A7%D8%A6%D9%82-%D9%81%D9%84%D9%84-%D8%A8%D8%A7%D9%84%D9%83%D9%88%D9%8A%D8%AA.jpg"}
+                                alt={introImage?.altAr || "تنسيق حدائق فلل"}
+                                className="rounded-lg shadow-xl w-full object-cover"
                             />
                             <div className="absolute -bottom-6 -right-6 bg-green-600 text-white p-6 rounded-lg shadow-lg">
                                 <Users className="w-8 h-8 mb-2" />
@@ -219,18 +247,50 @@ const About = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                        {teamMembers.map((member, index) => (
-                            <div key={index} className="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
-                                <img
-                                    src={member.image}
-                                    alt={member.name}
-                                    className="w-24 h-24 rounded-full object-cover mx-auto mb-4"
-                                />
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
-                                <p className="text-green-600 font-medium mb-2">{member.position}</p>
-                                <p className="text-gray-600 text-sm">{member.experience}</p>
-                            </div>
-                        ))}
+                        {teamMembers.length > 0 ? (
+                            teamMembers.map((member, index) => (
+                                <div key={member._id || index} className="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                                    <img
+                                        src={getImageSrc(member.imageUrl)}
+                                        alt={member.textAr || "عضو فريق"}
+                                        className="w-24 h-24 rounded-full object-cover mx-auto mb-4"
+                                    />
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">{member.textAr}</h3>
+                                    <p className="text-green-600 font-medium mb-2">{member.altAr}</p>
+                                    <p className="text-gray-600 text-sm">خبرة 10 سنوات</p>
+                                </div>
+                            ))
+                        ) : (
+                            // Fallback if no data
+                            [
+                                {
+                                    name: 'أحمد محمد',
+                                    position: 'مدير التصميم',
+                                    image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
+                                },
+                                {
+                                    name: 'سارة أحمد',
+                                    position: 'مهندسة زراعية',
+                                    image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
+                                },
+                                {
+                                    name: 'محمد علي',
+                                    position: 'مشرف التنفيذ',
+                                    image: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
+                                }
+                            ].map((member, index) => (
+                                <div key={index} className="text-center bg-gray-50 rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                                    <img
+                                        src={member.image}
+                                        alt={member.name}
+                                        className="w-24 h-24 rounded-full object-cover mx-auto mb-4"
+                                    />
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
+                                    <p className="text-green-600 font-medium mb-2">{member.position}</p>
+                                    <p className="text-gray-600 text-sm">خبرة سنوات</p>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </section>

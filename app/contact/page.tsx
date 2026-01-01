@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Phone,
     MessageCircle,
@@ -123,11 +123,42 @@ const Contact = () => {
         }
     ];
 
+    const [banner, setBanner] = useState<string>('');
+
+    useEffect(() => {
+        const fetchBanner = async () => {
+            try {
+                const res = await fetch('/api/banners');
+                const data = await res.json();
+                const contactBanner = data.find((b: any) => b.page === 'contact');
+                if (contactBanner) setBanner(contactBanner.image);
+            } catch (error) {
+                console.error('Failed to fetch banner:', error);
+            }
+        };
+        fetchBanner();
+    }, []);
+
+    // Helper to determine image source
+    const getImageSrc = (url: string) => {
+        if (!url) return '';
+        if (url.startsWith('http') || url.startsWith('/')) return url;
+        return `/api/images/${url}`;
+    };
+
     return (
         <div className="min-h-screen pt-20">
             {/* Header */}
-            <section className="py-20 bg-gradient-to-r from-green-600 to-green-700 text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <section
+                className={`py-20 relative text-white overflow-hidden ${!banner ? 'bg-gradient-to-r from-green-600 to-green-700' : 'bg-gray-900'}`}
+                style={{
+                    backgroundImage: banner ? `url(${getImageSrc(banner)})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                }}
+            >
+                {banner && <div className="absolute inset-0 bg-black/60"></div>}
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
                     <h1 className="text-4xl md:text-5xl font-bold mb-6">تواصل معنا</h1>
                     <p className="text-xl text-green-100 max-w-3xl mx-auto">
                         نحن هنا لمساعدتك في تحويل حلمك إلى حديقة خضراء مبهرة
