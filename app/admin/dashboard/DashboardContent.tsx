@@ -594,7 +594,6 @@ export default function AdminDashboard() {
   const tabNames: Record<string, string> = {
     projects: 'المشاريع',
     services: 'الخدمات',
-    testimonials: 'آراء العملاء',
     banners: 'البنرات',
     gallery: 'معرض الصور',
     'page-assets': 'محتوى الصفحات',
@@ -604,7 +603,7 @@ export default function AdminDashboard() {
     'link-mappings': 'الروابط الداخلية',
   };
 
-  const [activeTab, setActiveTab] = useState<'projects' | 'services' | 'testimonials' | 'banners' | 'gallery' | 'page-assets' | 'home-slides' | 'blogs' | 'seo-config' | 'link-mappings'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'services' | 'banners' | 'gallery' | 'page-assets' | 'home-slides' | 'blogs' | 'seo-config' | 'link-mappings'>('projects');
   const [projects, setProjects] = useState<Project[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -817,14 +816,6 @@ export default function AdminDashboard() {
       initialData.description = '';
       initialData.descriptionAr = '';
       initialData.icon = '';
-    } else if (activeTab === 'testimonials') {
-      initialData.name = '';
-      initialData.company = '';
-      initialData.location = '';
-      initialData.rating = 5;
-      initialData.text = '';
-      initialData.textAr = '';
-      initialData.approved = false;
     } else if (activeTab === 'blogs') {
       initialData.title = '';
       initialData.excerpt = '';
@@ -932,7 +923,6 @@ export default function AdminDashboard() {
           {[
             { id: 'projects', label: 'المشاريع' },
             { id: 'services', label: 'الخدمات' },
-            { id: 'testimonials', label: 'آراء العملاء' },
             { id: 'banners', label: 'البنرات' },
             // { id: 'gallery', label: 'معرض الصور' }, // Hidden - not needed
             { id: 'page-assets', label: 'محتوى الصفحات' },
@@ -1035,16 +1025,6 @@ export default function AdminDashboard() {
                 services={services}
                 onEdit={openEditForm}
                 onDelete={(id) => handleDelete('services', id)}
-                onAddNew={openNewForm}
-              />
-            )}
-
-            {activeTab === 'testimonials' && (
-              <TestimonialsSection
-                testimonials={testimonials}
-                onEdit={openEditForm}
-                onToggleApproved={(id, current) => handleToggleApproved(id, current)}
-                onDelete={(id) => handleDelete('testimonials', id)}
                 onAddNew={openNewForm}
               />
             )}
