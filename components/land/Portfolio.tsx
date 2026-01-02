@@ -8,15 +8,11 @@ import { PLACEHOLDER_KEYS, resolvePageAssetImage } from '@/lib/pageAssets';
 interface Project {
   _id: string;
   title: string;
-  titleAr: string;
   description: string;
-  descriptionAr: string;
   image: string;
   galleryImages?: string[];
   tags: string[];
-  tagsAr: string[];
   category: string;
-  categoryAr: string;
   year: string;
   link?: string;
   featured: boolean;
@@ -66,15 +62,11 @@ const Portfolio = () => {
 
   // Extract unique categories from projects
   const categories = [
-    { id: 'all', name: isRTL ? 'جميع الأعمال' : 'All Projects', nameAr: 'جميع الأعمال' },
-    ...Array.from(new Set(projects.map(p => p.category))).map(cat => {
-      const project = projects.find(p => p.category === cat);
-      return {
-        id: cat,
-        name: isRTL ? (project?.categoryAr || cat) : cat,
-        nameAr: project?.categoryAr || cat
-      };
-    })
+    { id: 'all', name: 'جميع الأعمال' },
+    ...Array.from(new Set(projects.map(p => p.category))).map(cat => ({
+      id: cat,
+      name: cat
+    }))
   ];
 
   const filteredProjects = selectedCategory === 'all'
@@ -191,39 +183,39 @@ const Portfolio = () => {
           {filteredProjects.map((project) => {
             const projectImageSrc = getImageUrl(project.image) || projectPlaceholder || '';
             return (
-            <div
-              key={project._id}
-              className="group cursor-pointer bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
-              onClick={() => openModal(project)}
-            >
-              <div className="relative overflow-hidden">
-                {projectImageSrc ? (
-                  <img
-                    src={projectImageSrc}
-                    alt={isRTL ? project.titleAr : project.title}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-                    onError={(e) => {
-                      if (!projectPlaceholder) {
-                        return;
-                      }
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = projectPlaceholder;
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-64 bg-gray-200" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className={`absolute bottom-4 ${isRTL ? 'right-4 left-4' : 'left-4 right-4'} text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
-                  <h3 className="text-lg font-bold mb-1">
-                    {isRTL ? project.titleAr : project.title}
-                  </h3>
-                  <p className="text-sm text-gray-200">
-                    {isRTL ? project.descriptionAr : project.description}
-                  </p>
+              <div
+                key={project._id}
+                className="group cursor-pointer bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                onClick={() => openModal(project)}
+              >
+                <div className="relative overflow-hidden">
+                  {projectImageSrc ? (
+                    <img
+                      src={projectImageSrc}
+                      alt={project.title}
+                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => {
+                        if (!projectPlaceholder) {
+                          return;
+                        }
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = projectPlaceholder;
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-64 bg-gray-200" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className={`absolute bottom-4 ${isRTL ? 'right-4 left-4' : 'left-4 right-4'} text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
+                    <h3 className="text-lg font-bold mb-1">
+                      {project.title}
+                    </h3>
+                    <p className="text-sm text-gray-200">
+                      {project.description}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
             );
           })}
         </div>
@@ -256,7 +248,7 @@ const Portfolio = () => {
               {(getImageUrl(selectedImage.image) || projectPlaceholder) ? (
                 <img
                   src={getImageUrl(selectedImage.image) || projectPlaceholder || ''}
-                  alt={isRTL ? selectedImage.titleAr : selectedImage.title}
+                  alt={selectedImage.title}
                   className="max-w-full max-h-full object-contain rounded-lg"
                   onError={(e) => {
                     if (!projectPlaceholder) {
@@ -272,14 +264,14 @@ const Portfolio = () => {
 
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-6 rounded-b-lg">
                 <h3 className="text-2xl font-bold mb-2">
-                  {isRTL ? selectedImage.titleAr : selectedImage.title}
+                  {selectedImage.title}
                 </h3>
                 <p className="text-gray-200">
-                  {isRTL ? selectedImage.descriptionAr : selectedImage.description}
+                  {selectedImage.description}
                 </p>
-                {(isRTL ? selectedImage.tagsAr : selectedImage.tags)?.length > 0 && (
+                {selectedImage.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">
-                    {(isRTL ? selectedImage.tagsAr : selectedImage.tags).map((tag, idx) => (
+                    {selectedImage.tags.map((tag: string, idx: number) => (
                       <span key={idx} className="bg-green-600/80 px-3 py-1 rounded-full text-sm">
                         {tag}
                       </span>

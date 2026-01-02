@@ -9,14 +9,11 @@ import { Monitor } from 'lucide-react';
 interface Project {
   _id: string;
   title: string;
-  titleAr: string;
   description: string;
-  descriptionAr: string;
   image: string;
+  galleryImages?: string[];
   tags: string[];
-  tagsAr: string[];
   category: string;
-  categoryAr: string;
   year: string;
   link?: string;
   featured: boolean;
@@ -25,12 +22,9 @@ interface Project {
 interface Service {
   _id: string;
   title: string;
-  titleAr: string;
   description: string;
-  descriptionAr: string;
   icon: string;
   features: string[];
-  featuresAr: string[];
   featured: boolean;
 }
 
@@ -2379,6 +2373,152 @@ function GalleryImagesUpload({
   );
 }
 
+// Available icons for services
+const AVAILABLE_ICONS = [
+  { name: 'leaf', label: 'ورقة' },
+  { name: 'tree-pine', label: 'شجرة صنوبر' },
+  { name: 'droplets', label: 'قطرات ماء' },
+  { name: 'scissors', label: 'مقص' },
+  { name: 'waves', label: 'أمواج' },
+  { name: 'umbrella', label: 'مظلة' },
+  { name: 'flower', label: 'زهرة' },
+  { name: 'wrench', label: 'مفتاح ربط' },
+  { name: 'hammer', label: 'مطرقة' },
+  { name: 'paint-bucket', label: 'دلو طلاء' },
+];
+
+// Icon Selector Component
+function IconSelector({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm text-white/70 mb-2">اختر الأيقونة</label>
+      <div className="grid grid-cols-5 gap-2">
+        {AVAILABLE_ICONS.map((icon) => (
+          <motion.button
+            key={icon.name}
+            type="button"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onChange(icon.name)}
+            className={`p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-1 ${value === icon.name
+              ? 'border-[#FFDD00] bg-[#FFDD00]/10 text-[#FFDD00]'
+              : 'border-white/10 bg-gray-800/50 text-white/70 hover:border-white/30'
+              }`}
+          >
+            <span className="text-2xl">
+              {icon.name === 'leaf' && '🌿'}
+              {icon.name === 'tree-pine' && '🌲'}
+              {icon.name === 'droplets' && '💧'}
+              {icon.name === 'scissors' && '✂️'}
+              {icon.name === 'waves' && '🌊'}
+              {icon.name === 'umbrella' && '☂️'}
+              {icon.name === 'flower' && '🌸'}
+              {icon.name === 'wrench' && '🔧'}
+              {icon.name === 'hammer' && '🔨'}
+              {icon.name === 'paint-bucket' && '🪣'}
+            </span>
+            <span className="text-xs truncate w-full text-center">{icon.label}</span>
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Features Input Component (Dynamic Bullet Points)
+function FeaturesInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string[];
+  onChange: (value: string[]) => void;
+}) {
+  const [newFeature, setNewFeature] = useState('');
+
+  const addFeature = () => {
+    if (newFeature.trim()) {
+      onChange([...(value || []), newFeature.trim()]);
+      setNewFeature('');
+    }
+  };
+
+  const removeFeature = (index: number) => {
+    const updated = [...(value || [])];
+    updated.splice(index, 1);
+    onChange(updated);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addFeature();
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <label className="block text-sm text-white/70">{label}</label>
+
+      {/* Existing features */}
+      <div className="space-y-2">
+        <AnimatePresence mode="popLayout">
+          {(value || []).map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-2 border border-white/10"
+            >
+              <span className="text-green-500">•</span>
+              <span className="flex-1 text-white text-sm">{feature}</span>
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => removeFeature(index)}
+                className="text-red-400 hover:text-red-300 text-lg font-bold"
+              >
+                ×
+              </motion.button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Add new feature */}
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={newFeature}
+          onChange={(e) => setNewFeature(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="أضف ميزة جديدة..."
+          className="flex-1 bg-gray-800/50 border border-white/20 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-[#FFDD00] transition-all duration-200"
+        />
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={addFeature}
+          disabled={!newFeature.trim()}
+          className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl text-sm font-medium hover:from-green-500 hover:to-green-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          إضافة
+        </motion.button>
+      </div>
+    </div>
+  );
+}
+
 // Enhanced Form Input Component
 // Enhanced Form Input Component - RTL Optimized
 function FormInput({
@@ -2487,60 +2627,45 @@ function FormModal({
           {type === 'projects' && (
             <>
               <FormInput
-                label={t('admin.form.title')}
+                label="العنوان"
                 value={data.title || ''}
                 onChange={(value) => updateField('title', value)}
-              />
-              <FormInput
-                label={t('admin.form.titleAr')}
-                value={data.titleAr || ''}
-                onChange={(value) => updateField('titleAr', value)}
+                required
               />
               <div>
-                <label className="block text-sm text-white/70 mb-2">{t('admin.form.description')}</label>
+                <label className="block text-sm text-white/70 mb-2">الوصف</label>
                 <textarea
                   value={data.description || ''}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
                   className="w-full bg-gray-800/50 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#FFDD00] focus:shadow-lg focus:shadow-[#FFDD00]/20 transition-all duration-200"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-white/70 mb-2">{t('admin.form.descriptionAr')}</label>
-                <textarea
-                  value={data.descriptionAr || ''}
-                  onChange={(e) => updateField('descriptionAr', e.target.value)}
-                  rows={3}
-                  className="w-full bg-gray-800/50 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#FFDD00] focus:shadow-lg focus:shadow-[#FFDD00]/20 transition-all duration-200"
+                  required
                 />
               </div>
               <ImageUploadField
-                label={t('admin.form.image')}
+                label="الصورة الرئيسية"
                 value={data.image || ''}
                 onChange={(fileId) => updateField('image', fileId)}
               />
               <GalleryImagesUpload
-                label="Gallery Images"
+                label="صور المعرض"
                 value={data.galleryImages || []}
                 onChange={(images) => updateField('galleryImages', images)}
               />
               <FormInput
-                label={t('admin.form.category')}
+                label="التصنيف"
                 value={data.category || ''}
                 onChange={(value) => updateField('category', value)}
+                required
               />
               <FormInput
-                label={t('admin.form.categoryAr')}
-                value={data.categoryAr || ''}
-                onChange={(value) => updateField('categoryAr', value)}
-              />
-              <FormInput
-                label={t('admin.form.year')}
+                label="السنة"
                 value={data.year || ''}
                 onChange={(value) => updateField('year', value)}
+                required
               />
               <FormInput
-                label={t('admin.form.link')}
+                label="الرابط (اختياري)"
                 value={data.link || ''}
                 onChange={(value) => updateField('link', value)}
               />
@@ -2550,37 +2675,29 @@ function FormModal({
           {type === 'services' && (
             <>
               <FormInput
-                label={t('admin.form.title')}
+                label="عنوان الخدمة"
                 value={data.title || ''}
                 onChange={(value) => updateField('title', value)}
-              />
-              <FormInput
-                label={t('admin.form.titleAr')}
-                value={data.titleAr || ''}
-                onChange={(value) => updateField('titleAr', value)}
+                required
               />
               <div>
-                <label className="block text-sm text-white/70 mb-2">{t('admin.form.description')}</label>
+                <label className="block text-sm text-white/70 mb-2">وصف الخدمة</label>
                 <textarea
                   value={data.description || ''}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
                   className="w-full bg-gray-800/50 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#FFDD00] focus:shadow-lg focus:shadow-[#FFDD00]/20 transition-all duration-200"
+                  required
                 />
               </div>
-              <div>
-                <label className="block text-sm text-white/70 mb-2">{t('admin.form.descriptionAr')}</label>
-                <textarea
-                  value={data.descriptionAr || ''}
-                  onChange={(e) => updateField('descriptionAr', e.target.value)}
-                  rows={3}
-                  className="w-full bg-gray-800/50 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#FFDD00] focus:shadow-lg focus:shadow-[#FFDD00]/20 transition-all duration-200"
-                />
-              </div>
-              <FormInput
-                label={t('admin.form.icon')}
-                value={data.icon || ''}
+              <IconSelector
+                value={data.icon || 'leaf'}
                 onChange={(value) => updateField('icon', value)}
+              />
+              <FeaturesInput
+                label="مميزات الخدمة (النقاط)"
+                value={data.features || []}
+                onChange={(value) => updateField('features', value)}
               />
             </>
           )}

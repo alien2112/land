@@ -2,13 +2,10 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IService extends Document {
   title: string;
-  titleAr: string;
   description: string;
-  descriptionAr: string;
-  icon: string; // SVG icon name or identifier
+  icon: string; // Icon name for lucide-react
   image?: string; // Optional image path
-  features: string[];
-  featuresAr: string[];
+  features: string[]; // Bullet points
   featured: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -20,30 +17,19 @@ const ServiceSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    titleAr: {
-      type: String,
-      required: true,
-    },
     description: {
-      type: String,
-      required: true,
-    },
-    descriptionAr: {
       type: String,
       required: true,
     },
     icon: {
       type: String,
       required: true,
+      default: 'leaf',
     },
     image: {
       type: String,
     },
     features: {
-      type: [String],
-      default: [],
-    },
-    featuresAr: {
       type: [String],
       default: [],
     },
@@ -58,6 +44,7 @@ const ServiceSchema: Schema = new Schema(
 );
 
 export default mongoose.models.Service || mongoose.model<IService>('Service', ServiceSchema);
+
 
 
 

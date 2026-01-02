@@ -21,13 +21,10 @@ import { PLACEHOLDER_KEYS, resolvePageAssetImage } from '@/lib/pageAssets';
 interface Service {
   _id: string;
   title: string;
-  titleAr: string;
   description: string;
-  descriptionAr: string;
   icon: string;
   image?: string;
   features: string[];
-  featuresAr: string[];
   featured: boolean;
 }
 
@@ -166,64 +163,64 @@ const Services = () => {
                 key={service._id}
                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group"
               >
-              <div className="relative overflow-hidden">
-                {serviceImageSrc ? (
-                  <img
-                    src={serviceImageSrc}
-                    alt={isRTL ? service.titleAr : service.title}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    onError={(e) => {
-                      if (!servicePlaceholder) {
-                        return;
-                      }
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = servicePlaceholder;
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-48 bg-gray-200" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
+                <div className="relative overflow-hidden">
+                  {serviceImageSrc ? (
+                    <img
+                      src={serviceImageSrc}
+                      alt={service.title}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => {
+                        if (!servicePlaceholder) {
+                          return;
+                        }
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = servicePlaceholder;
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
 
-              <div className="p-6">
-                <div className={`flex items-center mb-4 ${isRTL ? 'flex-row' : 'flex-row'}`}>
-                  <div className={`text-green-600 ${isRTL ? 'ml-3' : 'mr-3'}`}>
-                    {getIconComponent(service.icon)}
+                <div className="p-6">
+                  <div className={`flex items-center mb-4 ${isRTL ? 'flex-row' : 'flex-row'}`}>
+                    <div className={`text-green-600 ${isRTL ? 'ml-3' : 'mr-3'}`}>
+                      {getIconComponent(service.icon)}
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {service.title}
+                    </h3>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">
-                    {isRTL ? service.titleAr : service.title}
-                  </h3>
+
+                  <p className="text-gray-600 leading-relaxed">
+                    {service.description}
+                  </p>
+
+                  {/* Features list */}
+                  {(service.features || []).length > 0 && (
+                    <ul className={`mt-4 space-y-2 text-sm text-gray-500 ${isRTL ? 'pr-4' : 'pl-4'}`}>
+                      {service.features.slice(0, 3).map((feature: string, idx: number) => (
+                        <li key={idx} className="flex items-start">
+                          <span className={`text-green-500 ${isRTL ? 'ml-2' : 'mr-2'}`}>•</span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <div className="mt-6">
+                    <a
+                      href="#contact"
+                      className={`inline-flex items-center text-green-600 hover:text-green-700 font-semibold transition-colors duration-200`}
+                    >
+                      {isRTL ? 'اطلب الخدمة' : 'Request Service'}
+                      <svg className={`w-4 h-4 ${isRTL ? 'mr-2 rotate-180' : 'ml-2'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
-
-                <p className="text-gray-600 leading-relaxed">
-                  {isRTL ? service.descriptionAr : service.description}
-                </p>
-
-                {/* Features list */}
-                {((isRTL ? service.featuresAr : service.features) || []).length > 0 && (
-                  <ul className={`mt-4 space-y-2 text-sm text-gray-500 ${isRTL ? 'pr-4' : 'pl-4'}`}>
-                    {(isRTL ? service.featuresAr : service.features).slice(0, 3).map((feature, idx) => (
-                      <li key={idx} className="flex items-start">
-                        <span className={`text-green-500 ${isRTL ? 'ml-2' : 'mr-2'}`}>•</span>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                <div className="mt-6">
-                  <a
-                    href="#contact"
-                    className={`inline-flex items-center text-green-600 hover:text-green-700 font-semibold transition-colors duration-200`}
-                  >
-                    {isRTL ? 'اطلب الخدمة' : 'Request Service'}
-                    <svg className={`w-4 h-4 ${isRTL ? 'mr-2 rotate-180' : 'ml-2'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
               </div>
             );
           })}

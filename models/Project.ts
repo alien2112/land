@@ -2,15 +2,11 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IProject extends Document {
   title: string;
-  titleAr: string;
   description: string;
-  descriptionAr: string;
   image: string;
   galleryImages?: string[];
   tags: string[];
-  tagsAr: string[];
   category: string;
-  categoryAr: string;
   year: string;
   link?: string;
   featured: boolean;
@@ -24,15 +20,7 @@ const ProjectSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    titleAr: {
-      type: String,
-      required: true,
-    },
     description: {
-      type: String,
-      required: true,
-    },
-    descriptionAr: {
       type: String,
       required: true,
     },
@@ -44,7 +32,7 @@ const ProjectSchema: Schema = new Schema(
       type: [String],
       default: [],
       validate: {
-        validator: function(v: string[]) {
+        validator: function (v: string[]) {
           return v.length <= 4;
         },
         message: 'Gallery images cannot exceed 4 images',
@@ -54,15 +42,7 @@ const ProjectSchema: Schema = new Schema(
       type: [String],
       default: [],
     },
-    tagsAr: {
-      type: [String],
-      default: [],
-    },
     category: {
-      type: String,
-      required: true,
-    },
-    categoryAr: {
       type: String,
       required: true,
     },
