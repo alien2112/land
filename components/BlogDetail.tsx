@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { buildBlogPath } from '@/lib/site';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Tag } from 'lucide-react';
@@ -31,7 +32,11 @@ export default function BlogDetail({ blog }: BlogDetailProps) {
     useEffect(() => {
         setMounted(true);
         window.scrollTo(0, 0);
-    }, []);
+        const encodedPath = buildBlogPath(blog.slug);
+        if (window.location.pathname !== encodedPath) {
+            window.history.replaceState(null, '', encodedPath);
+        }
+    }, [blog.slug]);
 
     if (!blog) return null;
 

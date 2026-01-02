@@ -78,7 +78,7 @@ p {
 
 /* Safe Link Styling */
 .prose a,
-a:not(.btn):not(.no-style) {
+:where(a:not(.btn):not(.no-style)) {
   color: var(--primary);
   font-weight: 600;
   text-decoration: none;
@@ -87,7 +87,7 @@ a:not(.btn):not(.no-style) {
 }
 
 .prose a:hover,
-a:not(.btn):not(.no-style):hover {
+:where(a:not(.btn):not(.no-style):hover) {
   color: var(--primary-hover);
   border-bottom-color: var(--primary-hover);
 }
