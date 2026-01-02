@@ -275,7 +275,7 @@ const Home = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/services"
-              className="bg-[#0d9488] hover:bg-[#0f766e] text-[#FFDD00] px-8 py-4 rounded-xl text-lg font-black transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#0d9488]/40 ring-4 ring-transparent hover:ring-[#0d9488]/20"
+              className="bg-[#0d9488] hover:bg-[#0f766e] text-white px-8 py-4 rounded-xl text-lg font-black transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#0d9488]/40 ring-4 ring-transparent hover:ring-[#0d9488]/20"
             >
               اكتشف خدماتنا
             </Link>
@@ -377,7 +377,7 @@ const Home = () => {
           <div className="text-center">
             <Link
               href="/services"
-              className="bg-[#0d9488] hover:bg-[#0f766e] text-[#FFDD00] px-8 py-3 rounded-lg font-bold transition-all duration-200 transform hover:scale-105 shadow-lg"
+              className="bg-[#0d9488] hover:bg-[#0f766e] text-white px-8 py-3 rounded-lg font-bold transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               عرض جميع الخدمات
             </Link>
@@ -443,7 +443,7 @@ const Home = () => {
           <div className="text-center">
             <Link
               href="/portfolio"
-              className="bg-[#0d9488] hover:bg-[#0f766e] text-[#FFDD00] px-8 py-3 rounded-lg font-bold transition-all duration-200 transform hover:scale-105 shadow-lg"
+              className="bg-[#0d9488] hover:bg-[#0f766e] text-white px-8 py-3 rounded-lg font-bold transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               عرض معرض الأعمال كاملاً
             </Link>
@@ -506,7 +506,7 @@ const Home = () => {
           <div className="text-center">
             <Link
               href="/about"
-              className="bg-[#0d9488] hover:bg-[#0f766e] text-[#FFDD00] px-8 py-3 rounded-lg font-bold transition-all duration-200 transform hover:scale-105 shadow-lg"
+              className="bg-[#0d9488] hover:bg-[#0f766e] text-white px-8 py-3 rounded-lg font-bold transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               تعرف علينا أكثر
             </Link>

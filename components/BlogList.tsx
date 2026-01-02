@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Search, Tag } from 'lucide-react';
+import { buildBlogUrl } from '@/lib/site';
 
 interface Blog {
     _id: string;
@@ -70,7 +71,7 @@ export default function BlogList({ initialBlogs }: BlogListProps) {
                                 <p className="text-gray-600 text-lg leading-relaxed mb-6">{featuredPost.excerpt}</p>
 
                                 <Link
-                                    href={`/blog/${featuredPost.slug}`}
+                                    href={buildBlogUrl(featuredPost.slug)}
                                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 inline-flex items-center"
                                 >
                                     اقرأ المقال كاملاً
@@ -139,7 +140,7 @@ export default function BlogList({ initialBlogs }: BlogListProps) {
                                     </div>
 
                                     <Link
-                                        href={`/blog/${post.slug}`}
+                                        href={buildBlogUrl(post.slug)}
                                         className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center"
                                     >
                                         اقرأ المزيد

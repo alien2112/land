@@ -17,25 +17,34 @@ async function getBlog(slug: string) {
     try {
         await connectDB();
 
-        // 1. Try exact match
-        let blog = await Blog.findOne({ slug }).lean();
+        const candidates: string[] = [];
+        const addCandidate = (candidate: string) => {
+            if (!candidate || candidates.includes(candidate)) return;
+            candidates.push(candidate);
+        };
 
-        // 2. Try simple decode
-        if (!blog) {
-            const decodedSlug = decodeURIComponent(slug);
-            blog = await Blog.findOne({ slug: decodedSlug }).lean();
+        addCandidate(slug);
+
+        try {
+            addCandidate(decodeURIComponent(slug));
+        } catch { }
+
+        try {
+            addCandidate(decodeURIComponent(decodeURIComponent(slug)));
+        } catch { }
+
+        try {
+            addCandidate(encodeURIComponent(slug));
+        } catch { }
+
+        for (const candidate of candidates) {
+            const blog = await Blog.findOne({ slug: candidate }).lean();
+            if (blog) {
+                return JSON.parse(JSON.stringify(blog));
+            }
         }
 
-        // 3. Try double decode fallback for some mobile browsers
-        if (!blog) {
-            try {
-                const doubleDecoded = decodeURIComponent(decodeURIComponent(slug));
-                blog = await Blog.findOne({ slug: doubleDecoded }).lean();
-            } catch (e) { }
-        }
-
-        if (!blog) return null;
-        return JSON.parse(JSON.stringify(blog));
+        return null;
     } catch (error) {
         console.error("Error in getBlog:", error);
         return null;

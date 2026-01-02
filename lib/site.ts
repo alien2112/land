@@ -2,5 +2,11 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://almohtaref
 
 export function buildBlogUrl(slug: string): string {
   const cleanSlug = slug.replace(/^\/+/, '');
-  return `${SITE_URL}/blog/${encodeURIComponent(cleanSlug)}`;
+  let normalizedSlug = cleanSlug;
+  try {
+    normalizedSlug = decodeURIComponent(cleanSlug);
+  } catch {
+    normalizedSlug = cleanSlug;
+  }
+  return `${SITE_URL}/blog/${encodeURIComponent(normalizedSlug)}`;
 }
